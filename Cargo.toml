@@ -1,0 +1,8 @@
+[package]
+name = "tree"
+version = "0.1.0"
+authors = ["Louis Stewart <ls99@st-andrews.ac.uk>"]
+
+[dependencies]
+
+rand = "0.3.0"
