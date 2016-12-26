@@ -4,7 +4,7 @@ This will eventually be an implementation of the AVL algorithm for self-balancin
 binary trees in Rust. It is an exercise in learning to use Rust, and also a decent
 data structure to implement.
 
-## Api
+## Struct API 
 
 2 structs are created in this module, the generic data type structs of **Tree** and **Node**.
 The AVL tree struct stores the root **Node** and also presents the forward facing API for
