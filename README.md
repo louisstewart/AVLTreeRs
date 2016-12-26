@@ -4,7 +4,7 @@ This will eventually be an implementation of the AVL algorithm for self-balancin
 binary trees in Rust. It is an exercise in learning to use Rust, and also a decent
 data structure to implement.
 
-## Struct API 
+## Struct API
 
 2 structs are created in this module, the generic data type structs of **Tree** and **Node**.
 The AVL tree struct stores the root **Node** and also presents the forward facing API for
@@ -13,9 +13,10 @@ interacting with the data structure. The methods of the Node struct are private 
 1. Creation
 
   **Tree** is a generic data structure for all types that implement `PartialEq + Ord + Display` traits. Instantiate a new tree the `new(T)` constructor and cast to appropriate type.
-```rust
-let mut tree = Tree::new() as Tree<i32>
-```
+
+  ```rust
+  let mut tree = Tree::new() as Tree<i32>
+  ```
 
 2. Insertion
 
