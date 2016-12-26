@@ -41,6 +41,17 @@ impl<T : PartialEq + Ord + Display> Tree<T> {
             }
         }
     }
+
+    pub fn contains(& self, val : T) -> bool {
+        match &self.root {
+            &Some(ref node) => {
+                node.contains(val)
+            },
+            &None => {
+                false
+            }
+        }
+    }
 }
 
 impl<T : PartialEq + Ord + Display> Node<T> {
@@ -76,6 +87,24 @@ impl<T : PartialEq + Ord + Display> Node<T> {
     fn update_height(&mut self) {
         self.height = cmp::max(self.left.as_ref().map(|x| x.height()).unwrap_or(0),
             self.right.as_ref().map(|x| x.height()).unwrap_or(0)) + 1
+    }
+
+    fn contains(& self, val : T) -> bool {
+        match val.cmp(&self.value) {
+            Ordering::Equal => true,
+            Ordering::Less => {
+                match &self.left {
+                    &Some(ref node) => node.contains(val),
+                    &None => false
+                }
+            }
+            Ordering::Greater => {
+                match &self.right {
+                    &Some(ref node) => node.contains(val),
+                    &None => false
+                }
+            }
+        }
     }
 
     pub fn print(&self) {
@@ -163,20 +192,3 @@ fn insert_in<T : PartialEq + Ord + Display>(node : Option<Box<Node<T>>>, val : T
         None => Some(Box::new(Node::new(val)))
     }
 }
-
-/*fn rotateRight<T : PartialEq + PartialOrd + Display>(y : &mut Node<T>) -> Node<T> {
-    let &mut x = match &mut y.left {
-        &mut Some(ref mut node) => node,
-        &mut None => &mut None
-
-    };
-    let &mut t = match &mut x.right {
-        &mut Some(ref mut node) => node,
-        &mut None => &mut None
-    };
-
-    x.height = cmp::max((*x.left.unwrap()).height, (*x.right.unwrap()).height) + 1;
-    y.height = cmp::max((*y.left.unwrap()).height, (*y.right.unwrap()).height) + 1;
-
-    *x
-}*/

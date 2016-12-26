@@ -60,3 +60,19 @@ fn insert_test_balance() {
         panic!("Tree not constructed")
     }
 }
+
+#[test]
+fn search_test() {
+    let mut tree = Tree::new() as Tree<i32>;
+    assert!(tree.is_empty());
+    tree.insert(4);
+    tree.insert(2);
+    tree.insert(1);
+    tree.insert(5);
+
+    if let Some(ref node) = tree.root {
+            assert_eq!(3, node.height());
+    }
+
+    assert!(tree.contains(2))
+}
