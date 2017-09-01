@@ -144,6 +144,18 @@ fn insert<T: PartialEq + Ord + Display>(mut node : Box<Node<T>>, val : T) -> Box
     restructure(node)
 }
 
+fn delete<T: PartialEq + Ord + Display>(mut node: Box<Node<T>>, val : T) -> Box<Node<T>> {
+    match val.cmp((*node).get()) {
+        Ordering::Equal => {
+            return remove_in(node, val)
+        },
+        Ordering::Less => node.left = remove_in(node, val),
+        Ordering::More => node.right = remove_in(node, val)
+    }
+    node.update_height();
+    restructure(node)
+}
+
 fn restructure<T: PartialEq + Ord + Display>(mut node : Box<Node<T>>) -> Box<Node<T>> {
     let balance = node.bf();
     match balance {
@@ -204,4 +216,9 @@ fn insert_in<T : PartialEq + Ord + Display>(node : Option<Box<Node<T>>>, val : T
         },
         None => Some(Box::new(Node::new(val)))
     }
+}
+
+fn remove_in<T: PartialEq + Ord + Display>(node : Option<Box<Node<T>>>, val : t)
+        -> Option<Box<Node<T>>> {
+
 }
