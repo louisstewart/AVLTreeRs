@@ -52,6 +52,19 @@ impl<T : PartialEq + Ord + Display> Tree<T> {
             }
         }
     }
+
+    pub fn delete(& self, val: T) -> bool {
+        match &self.root.take() {
+            Some(node) => {
+                self.root = Some(delete(node, val))
+                true
+            },
+            None => {
+                self.root = None
+                false
+            }
+        }
+    }
 }
 
 impl<T : PartialEq + Ord + Display> Node<T> {
