@@ -80,11 +80,11 @@ impl<T : PartialEq + Ord + Display> Node<T> {
         &mut self.value
     }
 
-    pub fn left(& self) -> &Option<Box<Node<T>>> {
+    pub fn left(&self) -> &Option<Box<Node<T>>> {
         &self.left
     }
 
-    pub fn right(& self) -> &Option<Box<Node<T>>> {
+    pub fn right(&self) -> &Option<Box<Node<T>>> {
         &self.right
     }
 
