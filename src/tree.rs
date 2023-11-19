@@ -2,6 +2,7 @@ use std::fmt::Display;
 use std::cmp;
 use std::cmp::Ordering;
 
+#[derive(Debug, PartialEq)]
 pub struct Node<T> {
     pub left : Option<Box<Node<T>>>,
     pub right : Option<Box<Node<T>>>,
@@ -19,7 +20,7 @@ impl<T : PartialEq + Ord + Display> Tree<T> {
     }
 
     pub fn is_empty(&self) -> bool {
-        !self.root.is_some()
+        self.root.is_none()
     }
 
     pub fn print(&self) {
@@ -53,14 +54,14 @@ impl<T : PartialEq + Ord + Display> Tree<T> {
         }
     }
 
-    pub fn delete(& self, val: T) -> bool {
-        match &self.root.take() {
+    pub fn delete(&mut self, val: T) -> bool {
+        match self.root.take() {
             Some(node) => {
-                self.root = Some(delete(node, val))
+                self.root = delete(Some(node), val);
                 true
             },
             None => {
-                self.root = None
+                self.root = None;
                 false
             }
         }
@@ -72,11 +73,11 @@ impl<T : PartialEq + Ord + Display> Node<T> {
         Node { value : val, height : 1, left : None, right : None }
     }
 
-    pub fn get(&self) -> &T {
+    pub fn value(&self) -> &T {
         &self.value
     }
 
-    pub fn get_mut(&mut self) -> &mut T {
+    pub fn value_mut(&mut self) -> &mut T {
         &mut self.value
     }
 
@@ -132,9 +133,9 @@ impl<T : PartialEq + Ord + Display> Node<T> {
 }
 
 fn insert<T: PartialEq + Ord + Display>(mut node : Box<Node<T>>, val : T) -> Box<Node<T>> {
-    match val.cmp((*node).get()) {
+    match val.cmp((*node).value()) {
         Ordering::Equal => {
-            *(*node).get_mut() = val;
+            *(*node).value_mut() = val;
             return node
         },
         Ordering::Less => node.left = insert_in(node.left.take(), val),
@@ -144,22 +145,28 @@ fn insert<T: PartialEq + Ord + Display>(mut node : Box<Node<T>>, val : T) -> Box
     restructure(node)
 }
 
-fn delete<T: PartialEq + Ord + Display>(mut node: Box<Node<T>>, val : T) -> Box<Node<T>> {
-    match val.cmp((*node).get()) {
-        Ordering::Equal => {
-            return remove_in(node, val)
-        },
-        Ordering::Less => node.left = remove_in(node, val),
-        Ordering::More => node.right = remove_in(node, val)
+fn delete<T: PartialEq + Ord + Display>(node: Option<Box<Node<T>>>, val : T) -> Option<Box<Node<T>>> {
+    match node {
+        None => None,
+        Some(mut n) => {
+            match val.cmp((*n).value()) {
+                Ordering::Less => n.left = delete(n.left.take(), val),
+                Ordering::Greater => n.right = delete(n.right.take(), val),
+                Ordering::Equal => match remove_in(n) {
+                        Some(m) => n = m,
+                        None => return None
+                    }
+            }
+            n.update_height();
+            Some(restructure(n))
+        }
     }
-    node.update_height();
-    restructure(node)
 }
 
 fn restructure<T: PartialEq + Ord + Display>(mut node : Box<Node<T>>) -> Box<Node<T>> {
     let balance = node.bf();
     match balance {
-        -1...1 => return node,
+        -1..=1 => return node,
         2 => {
             let left = node.left.take().expect("Wtf");
             if  subtree_height(&left.left) < subtree_height(&left.right) {
@@ -208,6 +215,13 @@ fn rotate_left<T: PartialEq + Ord + Display>(mut node : Box<Node<T>>) -> Box<Nod
     b
 }
 
+fn minimum<T: PartialEq + Ord + Display>(mut node: Box<Node<T>>) -> Box<Node<T>>{
+    match node.left {
+        Some(n) => minimum(n),
+        None => node
+    }
+}
+
 fn insert_in<T : PartialEq + Ord + Display>(node : Option<Box<Node<T>>>, val : T)
         -> Option<Box<Node<T>>> {
     match node {
@@ -218,7 +232,28 @@ fn insert_in<T : PartialEq + Ord + Display>(node : Option<Box<Node<T>>>, val : T
     }
 }
 
-fn remove_in<T: PartialEq + Ord + Display>(node : Option<Box<Node<T>>>, val : t)
+/*
+ * 3 cases:
+ *  1) no kids, so remove returns none
+ *  2) only left or right kid, so replace
+ *  3) 2 kids, so find min greater
+ */
+fn remove_in<T: PartialEq + Ord + Display>(mut node : Box<Node<T>>)
         -> Option<Box<Node<T>>> {
-
+    if node.left.is_none() && node.right.is_none() {
+        return None;
+    }
+    else if node.left.is_none() && !node.right.is_none() {
+        return node.right;
+    }
+    else if node.right.is_none() && !node.left.is_none() {
+        return node.left;
+    }
+    else {
+        // Get in-order successor
+        let mut successor = minimum(node.right.take().unwrap());
+        successor.left = node.left;
+        successor.right = node.right;
+        return Some(successor)
+    }
 }

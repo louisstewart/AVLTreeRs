@@ -19,8 +19,8 @@ fn main() {
     tree.print();
 
     if let Some(ref node) = tree.root {
-        println!("Root is {:?}", node.get());
-        println!("Root left is {:?}", node.left().as_ref().map(|x| x.get()));
+        println!("Root is {:?}", node.value());
+        println!("Root left is {:?}", node.left().as_ref().map(|x| x.value()));
     }
     tree.print();
 }
