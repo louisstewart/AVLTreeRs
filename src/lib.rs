@@ -15,13 +15,13 @@ extern crate itertools;
 
 #[test]
 fn tree_make() {
-    let tree = Tree::new() as Tree<i32>;
+    let tree = Tree::new();
     assert!(tree.is_empty());
 }
 
 #[test]
 fn tree_insert() {
-    let mut tree = tree::Tree::new();
+    let mut tree = Tree::new();
     assert!(tree.is_empty());
     tree.insert(5);
     assert!(!tree.is_empty());
@@ -33,7 +33,7 @@ fn tree_insert() {
 
 #[test]
 fn insert_test_balance() {
-    let mut tree = Tree::new() as Tree<i32>;
+    let mut tree = Tree::new();
     assert!(tree.is_empty());
     tree.insert(4);
     tree.insert(2);
@@ -59,7 +59,7 @@ fn insert_test_balance() {
 
 #[test]
 fn search_test() {
-    let mut tree = Tree::new() as Tree<i32>;
+    let mut tree = Tree::new();
     assert!(tree.is_empty());
     tree.insert(4);
     tree.insert(2);
@@ -75,7 +75,7 @@ fn search_test() {
 
 #[test]
 fn test_remove() {
-    let mut tree = Tree::new() as Tree<i32>;
+    let mut tree = Tree::new();
     tree.insert(4);
     tree.insert(3);
     tree.insert(2);
