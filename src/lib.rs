@@ -15,7 +15,7 @@ extern crate itertools;
 
 #[test]
 fn tree_make() {
-    let tree = Tree::new();
+    let tree: Tree<i32> = Tree::new();
     assert!(tree.is_empty());
 }
 
@@ -96,9 +96,18 @@ fn test_remove() {
 
 #[quickcheck]
 fn test_with_big_set(xs: Vec<i32>) -> bool {
-    let canonical_set = xs.iter().cloned().collect::<BTreeSet<_>>();
+    let mut canonical_set = xs.iter().cloned().collect::<BTreeSet<_>>();
     let mut tree_set = Tree::new();
     xs.iter().cloned().for_each(|x| -> () {tree_set.insert(x);});
     xs.iter().cloned().all(|x| -> bool {tree_set.contains(x)});
-    equal(canonical_set.iter(), tree_set.iter())
+    equal(canonical_set.iter(), tree_set.iter());
+
+    let mut all_equal = true;
+    for x in xs {
+        tree_set.delete(x);
+        canonical_set.remove(&x);
+        all_equal &= equal(canonical_set.iter(), tree_set.iter())
+    }
+
+    all_equal
 }
