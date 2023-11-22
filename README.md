@@ -11,10 +11,10 @@ interacting with the data structure. The methods of the Node struct are private 
 
 1. Creation
 
-  **Tree** is a generic data structure for all types that implement `PartialEq + Ord + Display` traits. Instantiate a new tree using the `Tree::new()` constructor and cast to appropriate type.
+  **Tree** is a generic data structure for all types that implement `PartialEq + Ord` traits. Instantiate a new tree using the `Tree::new()` constructor and cast to appropriate type.
 
   ```rust
-  let mut tree = Tree::new() as Tree<i32>
+  let mut tree: Tree<i32> = Tree::new();
   ```
 For instance, this is a new tree of 32bit ints.
 
@@ -29,7 +29,7 @@ For instance, this is a new tree of 32bit ints.
   tree.insert(5);
   // New root should be 2
   if let Some(ref node) = tree.root {
-      assert!(2, *node.get())
+      assert!(2, *node.get());
   }
   ```
 
@@ -39,7 +39,7 @@ For instance, this is a new tree of 32bit ints.
 
   ```rust
   let x: bool = tree.contains(5);
-  assert!(x) // Succeeds if 5 was inserted
+  assert!(x); // Succeeds if 5 was inserted
   ```
 
 4. Deletion
@@ -48,6 +48,5 @@ For instance, this is a new tree of 32bit ints.
 
   ```rust
   // Assuming values above inserted
-  let x: bool = tree.delete(4) // true
-
+  let x: bool = tree.delete(4); // true
   ```
