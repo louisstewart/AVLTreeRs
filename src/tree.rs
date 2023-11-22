@@ -62,7 +62,6 @@ impl<'a, T: 'a + Ord + PartialEq> Tree<T> {
         }
     }
 
-    #[deny(clippy::all)]
     pub fn iter(&'a self) -> impl Iterator<Item = &'a T> + 'a {
         self.node_iter().map(|node| &node.value)
     }
