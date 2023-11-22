@@ -6,3 +6,6 @@ authors = ["Louis Stewart <ls99@st-andrews.ac.uk>"]
 [dependencies]
 
 rand = "0.3.0"
+quickcheck = "1.0.3"
+quickcheck_macros = "1.0.0"
+itertools = "0.12.0"

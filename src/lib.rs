@@ -3,7 +3,16 @@ pub mod tree;
 pub use tree::Tree;
 pub use tree::Node;
 
+use std::collections::BTreeSet;
+use itertools::equal;
+
 #[cfg(test)]
+extern crate quickcheck;
+#[cfg(test)]
+#[macro_use(quickcheck)]
+extern crate quickcheck_macros;
+extern crate itertools;
+
 #[test]
 fn tree_make() {
     let tree = Tree::new() as Tree<i32>;
@@ -20,19 +29,6 @@ fn tree_insert() {
         Some(root) => assert_eq!(*root.value(), 5),
         None => panic!("Failed to insert")
     }
-}
-
-#[test]
-fn print_test() {
-    let mut tree = tree::Tree::new();
-    assert!(tree.is_empty());
-    tree.insert(5);
-    assert!(!tree.is_empty());
-    match &tree.root {
-        &Some(ref root) => assert_eq!(*root.value(), 5),
-        &None => panic!("Failed to insert")
-    }
-    tree.print();
 }
 
 #[test]
@@ -96,4 +92,13 @@ fn test_remove() {
 
     assert!(tree.delete(1));
     assert!(!tree.contains(1));
+}
+
+#[quickcheck]
+fn test_with_big_set(xs: Vec<i32>) -> bool {
+    let canonical_set = xs.iter().cloned().collect::<BTreeSet<_>>();
+    let mut tree_set = Tree::new();
+    xs.iter().cloned().for_each(|x| -> () {tree_set.insert(x);});
+    xs.iter().cloned().all(|x| -> bool {tree_set.contains(x)});
+    equal(canonical_set.iter(), tree_set.iter())
 }
