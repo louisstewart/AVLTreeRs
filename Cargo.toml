@@ -1,11 +1,11 @@
 [package]
 name = "tree"
-version = "0.1.0"
-authors = ["Louis Stewart <ls99@st-andrews.ac.uk>"]
+version = "0.2.0"
+authors = ["Louis Stewart <louis.stewart@protonmail.com>"]
 
 [dependencies]
 
 rand = "0.3.0"
 quickcheck = "1.0.3"
 quickcheck_macros = "1.0.0"
-itertools = "0.12.0"
+itertools = { version = "0.12.0", features = [] }

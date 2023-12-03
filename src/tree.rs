@@ -100,7 +100,7 @@ impl<T : PartialEq + Ord> Tree<T> {
         }
     }
 
-    pub fn delete(&mut self, val: T) -> bool {
+    pub fn remove(&mut self, val: T) -> bool {
         match self.root.take() {
             Some(node) => {
                 self.root = delete(Some(node), val);
@@ -183,7 +183,7 @@ impl<T : PartialEq + Ord> Node<T> {
 fn insert<T: PartialEq + Ord>(mut node : Box<Node<T>>, val : T) -> Box<Node<T>> {
     match val.cmp((*node).value()) {
         Ordering::Equal => {
-            *(*node).value_mut() = val;
+            (*node).value = val;
             return node
         },
         Ordering::Less => node.left = insert_in(node.left.take(), val),
@@ -241,6 +241,10 @@ fn restructure<T: PartialEq + Ord>(mut node : Box<Node<T>>) -> Box<Node<T>> {
     }
 }
 
+fn subtree_height<T: PartialEq + Ord>(node : &Option<Box<Node<T>>>) -> i32 {
+    node.as_ref().map_or(0, |x| x.height())
+}
+
 fn rotate_right<T: PartialEq + Ord>(mut node : Box<Node<T>>) -> Box<Node<T>> {
     let mut b = node.left.take().expect("rotate right fail");
     node.left = b.right.take();
@@ -250,33 +254,40 @@ fn rotate_right<T: PartialEq + Ord>(mut node : Box<Node<T>>) -> Box<Node<T>> {
     b
 }
 
-fn subtree_height<T: PartialEq + Ord>(node : &Option<Box<Node<T>>>) -> i32 {
-    node.as_ref().map_or(0, |x| x.height())
-}
-
 fn rotate_left<T: PartialEq + Ord>(mut node : Box<Node<T>>) -> Box<Node<T>> {
-    let mut b = node.right.take().expect("rotate left fail");
-    node.right = b.left.take();
+    let mut right_node = node.right.take().expect("rotate left fail");
+    node.right = right_node.left.take();
     (*node).update_height();
-    b.left = Some(node);
-    (*b).update_height();
-    b
+    right_node.left = Some(node);
+    (*right_node).update_height();
+    right_node
 }
 
-fn minimum<T: PartialEq + Ord>(node: Box<Node<T>>) -> Box<Node<T>>{
-    match node.left {
-        Some(n) => minimum(n),
-        None => node
-    }
-}
-
-fn insert_in<T : PartialEq + Ord>(node : Option<Box<Node<T>>>, val : T)
-        -> Option<Box<Node<T>>> {
+fn insert_in<T : PartialEq + Ord>(node : Option<Box<Node<T>>>, val : T) -> Option<Box<Node<T>>> {
     match node {
         Some(n) => {
             Some(insert(n, val))
         },
         None => Some(Box::new(Node::new(val)))
+    }
+}
+
+fn remove_min<T: Ord>(node: Option<Box<Node<T>>>) -> (Option<Box<Node<T>>>, Option<Box<Node<T>>>) {
+    let mut node = match node {
+        Some(node) => node,
+        None => return (None, None),
+    };
+
+    match node.left.take() {
+        Some(left) => {
+            let (min_node, new_left) = remove_min(Some(left));
+            node.left = new_left;
+            (min_node, Some(node))
+        }
+        None => {
+            let right = node.right.take();
+            (Some(node), right)
+        },
     }
 }
 
@@ -286,7 +297,7 @@ fn insert_in<T : PartialEq + Ord>(node : Option<Box<Node<T>>>, val : T)
  *  2) only left or right kid, so replace
  *  3) 2 kids, so find min greater
  */
-fn remove_in<T: PartialEq + Ord>(mut node : Box<Node<T>>)
+fn remove_in<T: PartialEq + Ord>(node : Box<Node<T>>)
         -> Option<Box<Node<T>>> {
     if node.left.is_none() && node.right.is_none() {
         return None;
@@ -299,9 +310,10 @@ fn remove_in<T: PartialEq + Ord>(mut node : Box<Node<T>>)
     }
     else {
         // Get in-order successor
-        let mut successor = minimum(node.right.take().unwrap());
-        successor.left = node.left;
-        successor.right = node.right;
-        return Some(successor)
+        let (successor, new_right_subtree) = remove_min(node.right);
+        let mut new_node = successor.unwrap(); // We know successor exists here
+        new_node.left = node.left;
+        new_node.right = new_right_subtree;
+        Some(new_node)
     }
 }
